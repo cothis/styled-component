@@ -1,4 +1,6 @@
-import styled from '../lib/styled-components/styled-components';
+import styled, {
+  createGlobalStyle,
+} from '../lib/styled-components/styled-components';
 
 const Div = styled.div`
   background-color: red;
@@ -32,10 +34,17 @@ const H1 = styled.h1`
   display: ${(props: { woowa: boolean }) => (props.woowa ? 'none' : 'block')};
 `;
 
+const GlobalStyle = createGlobalStyle` 
+* {
+  color: aqua;
+}
+`;
+
 const App = () => {
   return (
     <div>
       React Boiler Plate
+      <GlobalStyle />
       <Div>
         <Button>버튼</Button>
         <A href="https://www.naver.com">앵커태그</A>

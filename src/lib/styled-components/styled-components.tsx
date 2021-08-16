@@ -2,16 +2,21 @@ import React, { ReactNode, useEffect, AllHTMLAttributes } from 'react';
 import domElements from './dom-elements';
 import { compile, serialize, stringify } from 'stylis';
 
-const stylis = (tag: string, content: string) =>
-  serialize(compile(`.${tag}{${content}}`), stringify);
-
 interface Props {
   children: ReactNode;
   [key: string]: any;
 }
 
-const constructWithTag = (tag: string) => {
-  const CustomTag = `${tag}` as keyof JSX.IntrinsicElements;
+const constructWithTag = (tag?: string) => {
+  const CustomTag = `${tag ?? 'div'}` as keyof JSX.IntrinsicElements;
+
+  const stylis = (tag: string | undefined, content: string) => {
+    if (!tag) {
+      return serialize(compile(`${content}`), stringify);
+    } else {
+      return serialize(compile(`.${tag}{${content}}`), stringify);
+    }
+  };
 
   const construct = (
     strings: TemplateStringsArray,
@@ -39,13 +44,15 @@ const constructWithTag = (tag: string) => {
       }, []);
 
       const domProps: { [key: string]: any } = {};
-      const $dom = document.createElement(tag);
-      Object.keys(props).forEach((prop) => {
-        if (prop in $dom) {
-          domProps[prop] = props[prop];
-        }
-      });
-      $dom.remove();
+      if (tag) {
+        const $dom = document.createElement(tag);
+        Object.keys(props).forEach((prop) => {
+          if (prop in $dom) {
+            domProps[prop] = props[prop];
+          }
+        });
+        $dom.remove();
+      }
 
       return (
         <CustomTag {...domProps} className={tag}>
@@ -71,3 +78,5 @@ domElements.forEach((domElement) => {
 });
 
 export default styled;
+
+export const createGlobalStyle = constructWithTag();
