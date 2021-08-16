@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { DOMElement, ReactNode, useEffect } from 'react';
 import domElements from './dom-elements';
 import { compile, serialize, stringify } from 'stylis';
 
@@ -49,9 +49,10 @@ const constructWithTag = (tag: string) => {
   return construct;
 };
 
-interface Styled {
-  [tag: string]: (strings: TemplateStringsArray, ...args: any[]) => Function;
-}
+type Styled = Record<
+  typeof domElements[number],
+  ReturnType<typeof constructWithTag>
+>;
 
 const styled: Styled = {};
 
