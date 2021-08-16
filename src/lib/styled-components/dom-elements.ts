@@ -1,4 +1,4 @@
-export default [
+export default <const>[
   'a',
   'abbr',
   'address',

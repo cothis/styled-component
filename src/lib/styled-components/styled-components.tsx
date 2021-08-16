@@ -72,7 +72,7 @@ type Styled = Record<
   ReturnType<typeof constructWithTag>
 >;
 
-const styled: Styled = {};
+const styled: Styled = {} as Styled;
 
 domElements.forEach((domElement) => {
   styled[domElement] = constructWithTag(domElement);
