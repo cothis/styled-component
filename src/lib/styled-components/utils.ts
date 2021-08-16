@@ -1,5 +1,3 @@
-const AD_REPLACER_R = /(a)(d)/gi;
-
 /* This is the "capacity" of our alphabet i.e. 2x26 for all letters plus their capitalised
  * counterparts */
 const charsLength = 52;
@@ -20,8 +18,5 @@ export function generateAlphabeticName(code: number) {
     name = getAlphabeticChar(x % charsLength) + name;
   }
 
-  return (getAlphabeticChar(x % charsLength) + name).replace(
-    AD_REPLACER_R,
-    '$1-$2'
-  );
+  return name;
 }
