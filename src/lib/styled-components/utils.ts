@@ -7,16 +7,23 @@ const getAlphabeticChar = (code: number) =>
   String.fromCharCode(code + (code > 25 ? 39 : 97));
 
 /* input a number, usually a hash and convert it to base-52 */
-export function generateAlphabeticName(code: number) {
-  let name = '';
-  let x;
+function makeHashNameGenerator() {
+  let sequence = 1;
 
-  code = code << 27;
+  return function () {
+    let name = '';
+    let x;
 
-  /* get a char and divide by alphabet-length */
-  for (x = Math.abs(code); x > charsLength; x = (x / charsLength) | 0) {
-    name = getAlphabeticChar(x % charsLength) + name;
-  }
+    const code = sequence << 27;
+    sequence++;
 
-  return name;
+    /* get a char and divide by alphabet-length */
+    for (x = Math.abs(code); x > charsLength; x = (x / charsLength) | 0) {
+      name = getAlphabeticChar(x % charsLength) + name;
+    }
+
+    return name;
+  };
 }
+
+export const generatorHashName = makeHashNameGenerator();

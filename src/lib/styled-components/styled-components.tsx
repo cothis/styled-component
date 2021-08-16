@@ -1,12 +1,10 @@
 import React, { ReactNode, useEffect } from 'react';
 import domElements from './dom-elements';
 import { compile, serialize, stringify, hash } from 'stylis';
-import { generateAlphabeticName } from './utils';
-
-let sequence = 1;
+import { generatorHashName } from './utils';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
   [key: string]: any;
 }
 
@@ -24,11 +22,10 @@ const constructWithTag = (tag?: string) => {
   const construct = (
     strings: TemplateStringsArray,
     ...args: any[]
-  ): Function => {
+  ): ((props: Props) => JSX.Element) => {
     const NewComponent = (props: Props) => {
-      const suffix = generateAlphabeticName(sequence);
+      const suffix = generatorHashName();
       const className = tag ? tag + '-' + suffix : '';
-      sequence++;
 
       useEffect(() => {
         const css = strings
