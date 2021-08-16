@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, AllHTMLAttributes } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import domElements from './dom-elements';
 import { compile, serialize, stringify } from 'stylis';
 
