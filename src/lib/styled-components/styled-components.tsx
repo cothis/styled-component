@@ -1,4 +1,4 @@
-import React, { DOMElement, ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, AllHTMLAttributes } from 'react';
 import domElements from './dom-elements';
 import { compile, serialize, stringify } from 'stylis';
 
@@ -7,6 +7,7 @@ const stylis = (tag: string, content: string) =>
 
 interface Props {
   children: ReactNode;
+  [key: string]: any;
 }
 
 const constructWithTag = (tag: string) => {
@@ -37,8 +38,17 @@ const constructWithTag = (tag: string) => {
         };
       }, []);
 
+      const domProps: { [key: string]: any } = {};
+      const $dom = document.createElement(tag);
+      Object.keys(props).forEach((prop) => {
+        if (prop in $dom) {
+          domProps[prop] = props[prop];
+        }
+      });
+      $dom.remove();
+
       return (
-        <CustomTag {...props} className={tag}>
+        <CustomTag {...domProps} className={tag}>
           {props.children}
         </CustomTag>
       );
