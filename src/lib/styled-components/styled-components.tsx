@@ -1,4 +1,10 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
+import domElements from './dom-elements';
+import { compile, serialize, stringify } from 'stylis';
+
+const stylis = (tag: string, content: string) =>
+  serialize(compile(`.${tag}{${content}}`), stringify);
+
 interface Props {
   children: ReactNode;
 }
@@ -11,7 +17,31 @@ const constructWithTag = (tag: string) => {
     ...args: any[]
   ): Function => {
     const NewComponent = (props: Props) => {
-      return <CustomTag {...props}>{props.children}</CustomTag>;
+      useEffect(() => {
+        const css = strings
+          .map((string, i) => {
+            let arg = args[i] ?? '';
+            if (arg instanceof Function) {
+              console.log(arg, props);
+              arg = arg(props);
+            }
+            return `${string}${arg}`;
+          })
+          .join('');
+        const classString = stylis(tag, css);
+        const $style = document.createElement('style');
+        $style.innerHTML = classString;
+        document.querySelector('head')?.appendChild($style);
+        return () => {
+          $style.remove();
+        };
+      }, []);
+
+      return (
+        <CustomTag {...props} className={tag}>
+          {props.children}
+        </CustomTag>
+      );
     };
     return NewComponent;
   };
@@ -19,12 +49,14 @@ const constructWithTag = (tag: string) => {
   return construct;
 };
 
-const styled = {
-  div: constructWithTag('div'),
-  span: constructWithTag('span'),
-  a: constructWithTag('a'),
-  form: constructWithTag('form'),
-  button: constructWithTag('button'),
-};
+interface Styled {
+  [tag: string]: (strings: TemplateStringsArray, ...args: any[]) => Function;
+}
+
+const styled: Styled = {};
+
+domElements.forEach((domElement) => {
+  styled[domElement] = constructWithTag(domElement);
+});
 
 export default styled;
