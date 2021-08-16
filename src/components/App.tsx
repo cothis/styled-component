@@ -24,12 +24,14 @@ const Button = styled.button`
     }
   }
 `;
+
 const A = styled.a`
   color: black;
   &:hover {
     color: purple;
   }
 `;
+
 const H1 = styled.h1`
   display: ${(props: { woowa: boolean }) => (props.woowa ? 'none' : 'block')};
 `;

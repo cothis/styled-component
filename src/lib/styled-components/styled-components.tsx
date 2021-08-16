@@ -1,6 +1,9 @@
 import React, { ReactNode, useEffect } from 'react';
 import domElements from './dom-elements';
-import { compile, serialize, stringify } from 'stylis';
+import { compile, serialize, stringify, hash } from 'stylis';
+import { generateAlphabeticName } from './utils';
+
+let sequence = 1;
 
 interface Props {
   children: ReactNode;
@@ -10,11 +13,11 @@ interface Props {
 const constructWithTag = (tag?: string) => {
   const CustomTag = `${tag ?? 'div'}` as keyof JSX.IntrinsicElements;
 
-  const stylis = (tag: string | undefined, content: string) => {
-    if (!tag) {
+  const stylis = (className: string | undefined, content: string) => {
+    if (!className) {
       return serialize(compile(`${content}`), stringify);
     } else {
-      return serialize(compile(`.${tag}{${content}}`), stringify);
+      return serialize(compile(`.${className}{${content}}`), stringify);
     }
   };
 
@@ -23,18 +26,21 @@ const constructWithTag = (tag?: string) => {
     ...args: any[]
   ): Function => {
     const NewComponent = (props: Props) => {
+      const suffix = generateAlphabeticName(sequence);
+      const className = tag ? tag + '-' + suffix : '';
+      sequence++;
+
       useEffect(() => {
         const css = strings
           .map((string, i) => {
             let arg = args[i] ?? '';
             if (arg instanceof Function) {
-              console.log(arg, props);
               arg = arg(props);
             }
             return `${string}${arg}`;
           })
           .join('');
-        const classString = stylis(tag, css);
+        const classString = stylis(className, css);
         const $style = document.createElement('style');
         $style.innerHTML = classString;
         document.querySelector('head')?.appendChild($style);
@@ -45,17 +51,15 @@ const constructWithTag = (tag?: string) => {
 
       const domProps: { [key: string]: any } = {};
       if (tag) {
-        const $dom = document.createElement(tag);
         Object.keys(props).forEach((prop) => {
-          if (prop in $dom) {
+          if (prop in HTMLElement.prototype) {
             domProps[prop] = props[prop];
           }
         });
-        $dom.remove();
       }
 
       return (
-        <CustomTag {...domProps} className={tag}>
+        <CustomTag {...domProps} className={className}>
           {props.children}
         </CustomTag>
       );
